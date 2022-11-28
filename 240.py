@@ -18,12 +18,11 @@ def errorbar(x, x_err, y, y_err, names, colors, j, beschriftung=[0, 0, 0], datei
     for n in range(j):
         print(n)
         ax.errorbar(x, y, xerr=x_err, yerr=y_err, label=names[n], fmt=',', color=colors[n])
-    edges = np.ptp(x) * .05
     data_range = np.linspace(0, 1500, np.size(x) * 5)
     y_fit = lin_model(data_range, 0.6, 5)
-    y_fit_2 = lin_model(data_range, 0.1, 4.364)
+    y_fit_2 = lin_model(data_range, 0.1136, 4.413)
     ax.plot(data_range, y_fit, label=r'$\mu_\textrm{\tiny{max}}$', color=colors[1], linewidth=1)
-    ax.plot(data_range, y_fit_2, label=r'$\mu_\textrm{\tiny{A}}$', color=colors[3], linewidth=1)
+    ax.plot(data_range, y_fit_2, label=r'$\mu_\textrm{\tiny{A}}$', color=colors[2], linewidth=1)
     # ax.errorbar(40, 23, label=r'$P_{W,max}$', fmt='x', color=colors[4])
     ax.grid(True)
     ax.set_title(beschriftung[0])
@@ -107,12 +106,17 @@ def lin_fit(x, y, x_err, y_err, title="", x_name="", y_name="", filename=f"lin-f
 
 data = np.loadtxt(f"240_3.csv")
 # x = data[:, 0]
+i = data[:, 0]
 x = ((data[:, 0]*1000/0.477)-(0.002/(1.256*10**(-6))/0.477*data[:, 1]/1000))
-x_err = np.abs(x*0.03)
 y = data[:, 1]
 y_err = np.abs(y*0.03)
+x_err = np.sqrt((1000/0.477*i*0.03)**2 +
+                ((1000*i-y/1000*0.002/1.256e-6)/0.477**2*0.004)**2 +
+                (y/1000/1.256e-6/0.477*0.00005)**2 +
+                (0.002/1.256e-6/0.477*y_err/1000)**2)
 
-#errorbar(x, 0, y, 0, [r'Datenpunkte'], colors, 1, [r'Hysteresekurve', r'$H\ [\textrm{A/m}]$', r'$B\ [\textrm{mT}]$'], f'240_3.pdf')
+
+#errorbar(x, x_err, y_err, 0, [r'Datenpunkte'], colors, 1, [r'Hysteresekurve', r'$H\ [\textrm{A/m}]$', r'$B\ [\textrm{mT}]$'], f'240_3.pdf')
 errorbar(x[:469], 0, y[:469], 0, [r'Datenpunkte'], colors, 1, [r'Neukurve', r'$H\ [\textrm{A/m}]$', r'$B\ [\textrm{mT}]$'], f'240_3_neuk.pdf')
 
 
